@@ -1,0 +1,14 @@
+#!/bin/bash
+printf "City of Bloomington\n"
+
+if [[ $(cat /etc/hostname) = *-template ]]; then
+        printf "This VM hasn't been renamed! Be sure to$(tput -T xterm setaf 3) change its hostname$(tput -T xterm sgr0)!"
+        printf "\n\n"
+fi
+
+uptime -p
+echo "Mem: Used: $(awk '/^Mem/ {print $3}' <(free -m))MB | Free: $(awk '/^Mem/ {print $4}' <(free -m))MB"
+
+printf "\n"
+printf "Networking information: \n"
+ip -br -c -4 addr

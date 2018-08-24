@@ -1,0 +1,23 @@
+#!/bin/bash
+sudo mv /tmp/20-cob /etc/update-motd.d/20-cob
+sudo chmod +x /etc/update-motd.d/20-cob
+
+echo "Removing /etc/machine-id and creating blank..."
+sudo rm -rf /etc/machine-id
+sudo touch /etc/machine-id
+
+echo "Symlinking dbus machine-id to systemd machine-id..."
+sudo rm -rf /var/lib/dbus/machine-id
+sudo ln -s /etc/machine-id /var/lib/dbus/machine-id
+
+echo "Force-rotating logs and deleting archives..."
+sudo logrotate -f /etc/logrotate.conf
+sudo rm /var/log/*.{1..5} 2>/dev/null
+sudo rm /var/log/*.{1..20}.gz 2>/dev/null
+
+echo "Clearing SSH host keys..."
+sudo rm /etc/ssh/ssh_host_*
+sudo dpkg-reconfigure openssh-server
+
+echo "Expiring default champ password..."
+sudo passwd --expire champ

@@ -1,0 +1,83 @@
+{
+    "builders": [
+    {
+        "type": "vsphere-iso",
+
+        "vcenter_server": "{{user `vcenter_server` }}",
+        "insecure_connection": "true",
+        "username": "{{user `vmware_username` }}",
+        "password": "{{user `vmware_password` }}",
+        "cluster": "{{user `vmware_cluster` }}",
+        "host": "{{user `vmware_host` }}",
+        "ssh_username": "champ",
+        "ssh_password": "ubuntu",
+        "vm_name":  "Ubuntu 18.04.1 - Packer",
+        "convert_to_template": "true",
+        "folder": "Templates",
+        "cpus": "1",
+        "CPU_hot_plug": "true",
+        "ram": "1024",
+        "RAM_hot_plug": "true",
+        "network": "VM Network",
+        "network_card": "vmxnet3",
+        "guest_os_type": "ubuntu64Guest",
+        "datastore": "{{user `vmware_datastore` }}",
+        "disk_controller_type":  "pvscsi",
+        "disk_size": "16384",
+        "disk_thin_provisioned": true,
+        "iso_paths": [
+            "[ark] Linux/ubuntu-18.04.1-server-amd64.iso"
+        ],
+
+        "boot_command": [
+        "<esc><wait>",
+        "<esc><wait>",
+        "<enter><wait>",
+        "/install/vmlinuz",
+        " auto",
+        " console-setup/ask_detect=false",
+        " console-setup/layoutcode=us",
+        " console-setup/modelcode=pc105",
+        " debconf/frontend=noninteractive",
+        " debian-installer=en_US",
+        " fb=false",
+        " initrd=/install/initrd.gz",
+        " kbd-chooser/method=us",
+        " keyboard-configuration/layout=USA",
+        " keyboard-configuration/variant=USA",
+        " locale=en_US",
+        " netcfg/get_hostname=ubuntu-template",
+        " grub-installer/bootdev=/dev/sda",
+        " noapic",
+        " hostname=ubuntu-template",
+        " preseed/url={{user `preseed_baseurl` }}/ubuntu-preseed.cfg",
+        " -- ",
+        "<enter>"
+        ]
+    }
+    ],
+
+    "provisioners": [
+        {
+            "type": "file",
+            "source":"_sharedfiles/20-cob",
+            "destination": "/tmp/20-cob"
+        },
+        {
+            "type": "file",
+            "source":"_sharedfiles/resolv.conf",
+            "destination": "/tmp/resolv.conf"
+        },
+        {
+            "type": "shell",
+            "execute_command":"echo 'ubuntu' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+            "script":"ubuntu/files/ubuntu-fixes.sh"
+        },
+        {
+            "type": "shell",
+            "execute_command":"echo 'ubuntu' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+            "script":"_sharedfiles/sysprep"
+        }
+
+    ]
+}

@@ -1,0 +1,50 @@
+{
+    "builders": [
+    {
+        "type": "vsphere-iso",
+
+        "vcenter_server": "{{user `vcenter_server` }}",
+        "insecure_connection": "true",
+        "username": "{{user `vmware_username` }}",
+        "password": "{{user `vmware_password` }}",
+        "cluster": "{{user `vmware_cluster` }}",
+        "host": "{{user `vmware_host` }}",
+        "ssh_username": "champ",
+        "ssh_password": "debian",
+        "vm_name":  "Debian 9.5",
+        "convert_to_template": "true",
+        "folder": "Templates",
+        "cpus": "1",
+        "CPU_hot_plug": "true",
+        "ram": "1024",
+        "RAM_hot_plug": "true",
+        "network": "VM Network",
+        "network_card": "vmxnet3",
+        "guest_os_type": "debian9_64Guest",
+        "datastore": "{{user `vmware_datastore` }}",
+        "disk_controller_type":  "pvscsi",
+        "disk_size": "16384",
+        "disk_thin_provisioned": true,
+        "iso_paths": [
+            "[ark] Linux/debian-9.5.0-amd64-netinst.iso"
+        ],
+        "boot_command": [
+            "<esc><wait>auto url={{user `preseed_baseurl` }}/debian-preseed.cfg hostname=debian-template<enter>"
+        ]
+    }
+    ],
+
+    "provisioners": [
+        {
+            "type": "file",
+            "source":"_sharedfiles/20-cob",
+            "destination": "/tmp/20-cob"
+        },
+        {
+            "type": "shell",
+            "execute_command":"echo 'debian' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+            "script":"_sharedfiles/sysprep"
+        }
+
+    ]
+}
