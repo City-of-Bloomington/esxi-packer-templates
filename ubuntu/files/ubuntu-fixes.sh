@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt-get update
-sudo apt-get dist-upgrade
+sudo apt-get -y dist-upgrade
 
 # systemd-resolved is just more trouble than it's worth in our environment
 # it constantly causes problems with our locally hosted DNS
